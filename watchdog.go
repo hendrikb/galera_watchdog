@@ -14,11 +14,14 @@ var (
 	DB  *sql.DB
 	err error
 
-	mysqlHost = kingpin.Flag("host", "Connect to host.").Default("localhost").Short('h').String()
-	mysqlUser = kingpin.Flag("user", "User for login.").Default("root").Short('u').String()
-	mysqlPass = kingpin.Flag("password", "Password to use when connecting to server.").Short('h').String()
 	httpHost = kingpin.Flag("http-host", "Connect to host").Default("localhost").Short('H').String()
 	httpPort = kingpin.Flag("http-port", "Connect to host").Default("9199").Short('P').String()
+
+	mysqlHost = kingpin.Flag("sql-host", "Connect to host").Default("localhost").Short('h').String()
+	mysqlUser = kingpin.Flag("sql-user", "User for login").Default("root").Short('u').String()
+	mysqlPass = kingpin.Flag("sql-password", "Password to use when connecting to server").Short('p').String()
+
+	donorOk = kingpin.Flag("donor-ok", "treat donor as regular working node").Short('d').Bool()
 )
 
 func main() {
@@ -49,8 +52,11 @@ func statusHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	switch value {
-	case 4, 2:
+	switch {
+	case 4 == value:
+		fmt.Fprintf(w, "Galera Node is running.")
+		return
+	case 2 == value && *donorOk == true:
 		fmt.Fprintf(w, "Galera Node is running.")
 		return
 	default:
