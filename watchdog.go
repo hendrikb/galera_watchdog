@@ -17,6 +17,8 @@ var (
 	mysqlHost = kingpin.Flag("host", "Connect to host.").Default("localhost").Short('h').String()
 	mysqlUser = kingpin.Flag("user", "User for login.").Default("root").Short('u').String()
 	mysqlPass = kingpin.Flag("password", "Password to use when connecting to server.").Short('h').String()
+	httpHost = kingpin.Flag("http-host", "Connect to host").Default("localhost").Short('H').String()
+	httpPort = kingpin.Flag("http-port", "Connect to host").Default("9199").Short('P').String()
 )
 
 func main() {
@@ -29,7 +31,7 @@ func main() {
 		log.Fatal(err)
 	}
 	http.HandleFunc("/", statusHandler)
-	http.ListenAndServe(":9199", nil)
+	http.ListenAndServe(*httpHost+":"+*httpPort, nil)
 }
 
 func statusHandler(w http.ResponseWriter, r *http.Request) {
