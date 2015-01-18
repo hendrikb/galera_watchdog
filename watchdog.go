@@ -2,33 +2,35 @@ package main
 
 import (
 	"database/sql"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
 
-	"github.com/alecthomas/kingpin"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/vharitonsky/iniflags"
 )
 
 var (
 	DB  *sql.DB
 	err error
 
-	httpHost = kingpin.Flag("http-host", "Connect to host").Default("localhost").Short('H').String()
-	httpPort = kingpin.Flag("http-port", "Connect to host").Default("9199").Short('P').String()
+	httpHost = flag.String("HTTP_HOST", "localhost", "Connect to host")
+	httpPort = flag.String("HTTP_PORT", "9199", "Connect to host")
 
-	mysqlHost = kingpin.Flag("sql-host", "Connect to host").Default("localhost").Short('h').String()
-	mysqlUser = kingpin.Flag("sql-user", "User for login").Default("root").Short('u').String()
-	mysqlPass = kingpin.Flag("sql-password", "Password to use when connecting to server").Short('p').String()
+	sqlHost = flag.String("MYSQL_HOST", "localhost", "Connect to host")
+	sqlPort = flag.String("MYSQL_PORT", "3306", "Connect to host")
+	sqlUser = flag.String("MYSQL_USER", "root", "User for login to MySQL")
+	sqlPass = flag.String("MYSQL_PASS", "", "Password for login to MySQL")
 
-	donorOk = kingpin.Flag("donor-ok", "treat donor as regular working node").Short('d').Bool()
+	donorOk = flag.Bool("DONOR_OK", false, "treat donor as regular working node")
 )
 
 func main() {
-	kingpin.Parse()
+	iniflags.Parse()
 	DB, err = sql.Open(
 		"mysql",
-		fmt.Sprintf("%s:%s@tcp(%s:3306)/mysql", *mysqlUser, *mysqlPass, *mysqlHost),
+		fmt.Sprintf("%s:%s@tcp(%s:%s)/mysql", *sqlUser, *sqlPass, *sqlHost, *sqlPort),
 	)
 	if err != nil {
 		log.Fatal(err)
@@ -56,7 +58,7 @@ func statusHandler(w http.ResponseWriter, r *http.Request) {
 	case 4 == value:
 		fmt.Fprintf(w, "Galera Node is running.")
 		return
-	case 2 == value && *donorOk == true:
+	case 2 == value && *donorOk:
 		fmt.Fprintf(w, "Galera Node is running.")
 		return
 	default:
