@@ -24,10 +24,18 @@ var (
 	sqlPass = flag.String("MYSQL_PASS", "", "Password for login to MySQL")
 
 	donorOk = flag.Bool("DONOR_OK", false, "treat donor as regular working node")
+
+	showVersion = flag.Bool("version", false, fmt.Sprint("Show current version: ", Commit))
+
+	Commit = "dev"
 )
 
 func main() {
 	iniflags.Parse()
+	if *showVersion {
+	  fmt.Println(Commit)
+	  return
+	}
 	DB, err = sql.Open(
 		"mysql",
 		fmt.Sprintf("%s:%s@tcp(%s:%s)/mysql", *sqlUser, *sqlPass, *sqlHost, *sqlPort),
