@@ -5,6 +5,8 @@
 *.o
 *.a
 *.so
+*.deb
+/galera_watchdog
 
 # Folders
 _obj
