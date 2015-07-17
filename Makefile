@@ -1,14 +1,15 @@
+VERSION = $(shell cat VERSION)
 COMMIT = $(shell git rev-parse --short HEAD)
 BRANCH = $(shell git rev-parse --abbrev-ref HEAD)
 
 all:
-	go build -ldflags "-X main.Commit $(BRANCH)-$(COMMIT)" 
+	go build -ldflags "-X main.Commit $(VERSION)-$(BRANCH)-$(COMMIT)" 
 
 deb_package: all
 	rm -f galera*watchdog*.deb
 	mkdir bin
 	cp galera_watchdog bin/
-	fpm --prefix=/usr --url https://github.com/crahles/galera_watchdog -s dir -t deb -n galera_watchdog -m'christoph@rahles.de' -v $(BRANCH)-$(COMMIT) bin/galera_watchdog
+	fpm --prefix=/usr --url https://github.com/crahles/galera_watchdog -s dir -t deb -n galera_watchdog -m'christoph@rahles.de' -v $(VERSION)-$(BRANCH)-$(COMMIT) bin/galera_watchdog
 	rm -rf bin/
 
 install: all
